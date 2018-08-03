@@ -14,6 +14,11 @@ export default Component.extend(Fadable, {
   layout,
 
   classNames: [ 'animated-status-label' ],
+  classNameBindings: [
+    'isSettled:settled',
+    'isPending:pending',
+    'isConfirming:confirming'
+  ],
 
   confirmationDuration: 1500,
   promise: undefined,

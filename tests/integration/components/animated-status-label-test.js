@@ -1,8 +1,9 @@
 import RSVP from 'rsvp'
 import { module, test } from 'qunit'
 import { setupRenderingTest } from 'ember-qunit'
-import { render, waitUntil } from '@ember/test-helpers'
+import { render } from '@ember/test-helpers'
 import { setProperties } from '@ember/object'
+import { waitForStateChange, waitUntilConfirming, waitUntilSettled } from 'ember-animated-status-label/test-support'
 import hbs from 'htmlbars-inline-precompile'
 
 module('Integration | Component | animated-status-label', function(hooks) {
@@ -44,16 +45,16 @@ module('Integration | Component | animated-status-label', function(hooks) {
   test('it handles resolving promises', async function(assert) {
     await this.renderComponent({ promise: new RSVP.resolve() })
     assert.equal(this.element.textContent.trim(), this.pendingContent, 'initially shows pending content')
-    await waitUntil(() => this.element.textContent.trim() !== this.pendingContent)
+    await waitForStateChange()
     assert.equal(this.element.textContent.trim(), this.confirmationContent, 'transitions to confirmation content')
-    await waitUntil(() => this.element.textContent.trim() !== this.confirmationContent)
+    await waitForStateChange()
     assert.equal(this.element.textContent.trim(), this.settledContent, 'transitions to settled content')
   })
 
   test('it handles rejecting promises', async function(assert) {
     await this.renderComponent({ promise: new RSVP.reject() })
     assert.equal(this.element.textContent.trim(), this.pendingContent, 'initially shows pending content')
-    await waitUntil(() => this.element.textContent.trim() !== this.pendingContent)
+    await waitForStateChange()
     assert.equal(this.element.textContent.trim(), this.settledContent, 'transitions to settled content')
   })
 
@@ -65,9 +66,9 @@ module('Integration | Component | animated-status-label', function(hooks) {
       promise: new RSVP.resolve(),
       onConfirmationFinished: () => assert.ok(hasShownConfirmation && !hasShownSettled)
     })
-    await waitUntil(() => this.element.textContent.trim() !== this.pendingContent)
+    await waitUntilConfirming()
     hasShownConfirmation = this.element.textContent.trim() === this.confirmationContent
-    await waitUntil(() => this.element.textContent.trim() !== this.confirmationContent)
+    await waitUntilSettled()
     hasShownSettled = this.element.textContent.trim() === this.settledContent
   })
 })
